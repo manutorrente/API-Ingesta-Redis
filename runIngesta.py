@@ -1,7 +1,9 @@
 import subprocess
 import os
 from dotenv import load_dotenv
+import logging
 
+logger = logging.getLogger(__name__) 
 
 def run_redis_ingestion_script(table_name: str) -> int:
     """
@@ -31,20 +33,26 @@ def run_redis_ingestion_script(table_name: str) -> int:
     script_name = os.getenv("SCRIPT_NAME")
     
     if not script_path:
+        logger.error("SCRIPT_PATH environment variable is not set")
         raise EnvironmentError("SCRIPT_PATH environment variable is not set")
     
     if not script_name:
+        logger.error("SCRIPT_NAME environment variable is not set")
         raise EnvironmentError("SCRIPT_NAME environment variable is not set")
     
     if not os.path.exists(script_path):
+        logger.error(f"Script path does not exist: {script_path}")
         raise FileNotFoundError(f"Script directory not found: {script_path}")
     
     script_full_path = os.path.join(script_path, script_name)
     if not os.path.exists(script_full_path):
+        logger.error(f"Script file not found: {script_full_path}")
         raise FileNotFoundError(f"Script file not found: {script_full_path}")
     
     command = ["bash", script_name, "-t", table_name]
-    
+
+    logger.info(f"Running command: {' '.join(command)} in {script_path}")
+
     # Start process completely detached
     process = subprocess.Popen(
         command,
@@ -53,7 +61,9 @@ def run_redis_ingestion_script(table_name: str) -> int:
         stderr=subprocess.DEVNULL,
         stdin=subprocess.DEVNULL
     )
-    
+
+    logger.info(f"Ingestion for table '{table_name}' started with PID {process.pid}")
+
     return process.pid
 
 
