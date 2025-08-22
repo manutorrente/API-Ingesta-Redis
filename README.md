@@ -71,9 +71,11 @@ Install the required Python packages:
 pip install -r requirements.txt
 ```
 
-### Step 6: Environment Configuration
+### Step 6: Configuration
 
-Create and configure the `.env` file:
+#### Environment Variables (.env)
+
+Create and configure the `.env` file for sensitive credentials:
 
 ```bash
 cp .env.example .env  # If you have an example file
@@ -81,20 +83,36 @@ cp .env.example .env  # If you have an example file
 nano .env
 ```
 
-Add the following environment variables to your `.env` file:
+Add the following credentials to your `.env` file:
 
 ```env
-# API Configuration
-API_HOST=0.0.0.0
-API_PORT=8000
+# API Credentials
 API_USERNAME=your_api_username
 API_PASSWORD=your_bcrypt_hashed_password
+```
 
-# Script Configuration
-SCRIPT_PATH=/path/to/your/redis/scripts
-SCRIPT_NAME=your_script_name.sh
+#### Application Configuration (config.json)
 
+Create and configure the `config.json` file for application settings:
 
+```bash
+cp config.example.json config.json
+nano config.json
+```
+
+Update the configuration values in `config.json`:
+
+```json
+{
+  "api": {
+    "host": "0.0.0.0",
+    "port": 8000
+  },
+  "redis_ingestion": {
+    "script_path": "/path/to/your/redis/scripts",
+    "script_name": "your_script_name.sh"
+  }
+}
 ```
 
 #### Generating Bcrypt Password Hash
@@ -111,6 +129,8 @@ print('Hashed password:', hashed.decode('utf-8'))
 ```
 
 Copy the generated hash and use it as the `API_PASSWORD` value in your `.env` file.
+
+**Note**: The `config.json` file contains non-sensitive application settings and should be created from the `config.example.json` template. The actual `config.json` file is excluded from version control for environment-specific configurations.
 
 ### Step 7: Test the Application
 
@@ -300,9 +320,14 @@ curl -u username:password -X POST \
 
 If port 8000 is already in use, either:
 
-1. Change the port in the `.env` file:
-   ```env
-   API_PORT=8001
+1. Change the port in the `config.json` file:
+   ```json
+   {
+     "api": {
+       "host": "0.0.0.0",
+       "port": 8001
+     }
+   }
    ```
 
 2. Or find and stop the service using the port:
@@ -319,7 +344,7 @@ If port 8000 is already in use, either:
 
 ### Script Execution Issues
 
-1. Verify the `SCRIPT_PATH` and `SCRIPT_NAME` in the `.env` file
+1. Verify the `script_path` and `script_name` in the `config.json` file
 2. Ensure the script file exists and is executable:
    ```bash
    ls -la /path/to/your/redis/scripts/
@@ -340,22 +365,32 @@ If port 8000 is already in use, either:
 redis-ingestion-api/
 ├── main.py              # FastAPI application
 ├── runIngesta.py        # Redis ingestion script runner
+├── config.py            # Configuration management module
 ├── requirements.txt     # Python dependencies
-├── .env                 # Environment configuration
+├── .env                 # Environment credentials (not in git)
 ├── .env.example         # Example environment file
+├── config.json          # Application configuration (not in git)
+├── config.example.json  # Example configuration file
 └── README.md           # This file
 ```
 
-## Environment Variables Reference
+## Configuration Reference
+
+### Environment Variables (.env file)
 
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
-| `API_HOST` | Host to bind the API server | No | `0.0.0.0` |
-| `API_PORT` | Port for the API server | No | `8000` |
 | `API_USERNAME` | Basic auth username | Yes | - |
 | `API_PASSWORD` | Bcrypt hashed password | Yes | - |
-| `SCRIPT_PATH` | Path to Redis ingestion scripts | Yes | - |
-| `SCRIPT_NAME` | Name of the script file | Yes | - |
+
+### Application Configuration (config.json file)
+
+| Section | Variable | Description | Required | Default |
+|---------|----------|-------------|----------|---------|
+| `api` | `host` | Host to bind the API server | No | `0.0.0.0` |
+| `api` | `port` | Port for the API server | No | `8000` |
+| `redis_ingestion` | `script_path` | Path to Redis ingestion scripts | Yes | - |
+| `redis_ingestion` | `script_name` | Name of the script file | Yes | - |
 
 ## Support
 

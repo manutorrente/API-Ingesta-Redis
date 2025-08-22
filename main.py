@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import bcrypt
 import logging
 from runIngesta import run_redis_ingestion_script
+from config import config
 
 load_dotenv(override=True)
 
@@ -104,6 +105,13 @@ async def trigger_ingestion(
             detail=f"Invalid request: {str(e)}"
         )
         
+    except KeyError as e:
+        logger.error(f"Configuration error: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Server configuration error: {str(e)}"
+        )
+        
     except FileNotFoundError as e:
         logger.error(f"File not found error: {str(e)}")
         raise HTTPException(
@@ -128,7 +136,7 @@ async def trigger_ingestion(
 if __name__ == "__main__":
     import uvicorn
     
-    host = os.getenv("API_HOST", "0.0.0.0")
-    port = int(os.getenv("API_PORT", "8000"))
+    host = config["api"]["host"]
+    port = config["api"]["port"]
     
     uvicorn.run(app, host=host, port=port)

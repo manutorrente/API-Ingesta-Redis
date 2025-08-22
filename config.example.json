@@ -1,0 +1,13 @@
+{
+  "api": {
+    "host": "0.0.0.0",
+    "port": 8000
+  },
+  "redis_ingestion": {
+    "script_path": "/path/to/your/redis/scripts",
+    "script_name": "your_script_name.sh"
+  },
+  "validation": {
+    "subenvironment": "your_subenvironment_prefix"
+  }
+}

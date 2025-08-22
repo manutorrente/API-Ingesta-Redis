@@ -185,5 +185,6 @@ $RECYCLE.BIN/
 logs/
 temp/
 tmp/
+config.json
 
 .qodo
