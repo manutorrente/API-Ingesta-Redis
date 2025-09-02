@@ -87,6 +87,9 @@ def run_redis_ingestion_script(table_name: str) -> int:
     command = ["/bin/bash", script_name, "-t", table_name]
 
     logger.info(f"Running command: {' '.join(command)} in {script_path}")
+    
+    env = os.environ.copy()
+    env["PATH"] = "/usr/local/bin:/usr/bin:/bin"
 
     # Start process completely detached
     process = subprocess.Popen(
@@ -94,7 +97,8 @@ def run_redis_ingestion_script(table_name: str) -> int:
         cwd=script_path,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
-        stdin=subprocess.DEVNULL
+        stdin=subprocess.DEVNULL,
+        env=env
     )
 
     logger.info(f"Ingestion for table '{table_name}' started with PID {process.pid}")
