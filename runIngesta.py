@@ -83,8 +83,8 @@ def run_redis_ingestion_script(table_name: str) -> int:
     if not os.path.exists(script_full_path):
         logger.error(f"Script file not found: {script_full_path}")
         raise FileNotFoundError(f"Script file not found: {script_full_path}")
-    
-    command = ["/bin/bash", script_full_path, "-t", table_name]
+
+    command = ["cd", script_path, "&&", "/bin/bash", script_name, "-t", table_name]
 
     logger.info(f"Running command: {' '.join(command)} in {script_path}")
 
