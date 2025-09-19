@@ -3,7 +3,7 @@ from typing import Optional
 import secrets
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from dotenv import load_dotenv
 import bcrypt
 import logging
@@ -25,6 +25,15 @@ security = HTTPBasic()
 
 class TableRequest(BaseModel):
     table: str = Field(..., min_length=1, description="Table name for Redis ingestion")
+    notification_email: Optional[str] = Field(
+        None, description="Optional email for notifications"
+    )
+
+    @field_validator("notification_email")
+    def validate_email(cls, v):
+        if v and "@" not in v:
+            raise ValueError("Invalid email address")
+        return v
 
 class IngestionResponse(BaseModel):
     success: bool
@@ -88,7 +97,7 @@ async def trigger_ingestion(
     try:
         logger.info(f"User {username} triggering ingestion for table: {request.table}")
         
-        pid = run_redis_ingestion_script(request.table)
+        pid = run_redis_ingestion_script(request.table, request.notification_email)
         
         logger.info(f"Successfully started ingestion script with PID {pid} for table: {request.table}")
         

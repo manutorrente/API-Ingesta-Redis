@@ -36,7 +36,7 @@ def validate_table_name(table_name: str) -> None:
         )
 
 
-def run_redis_ingestion_script(table_name: str) -> int:
+def run_redis_ingestion_script(table_name: str, notification_email: str | None = None) -> int:
     """
     Runs the Redis ingestion script in fire-and-forget mode.
     Starts the script and completely detaches from it, returning immediately.
@@ -85,6 +85,9 @@ def run_redis_ingestion_script(table_name: str) -> int:
         raise FileNotFoundError(f"Script file not found: {script_full_path}")
 
     command = ["/bin/bash", script_name, "-t", table_name]
+    
+    if notification_email:
+        command.extend(["--receiver-email", notification_email])
 
     logger.info(f"Running command: {' '.join(command)} in {script_path}")
     
