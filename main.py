@@ -25,14 +25,20 @@ security = HTTPBasic()
 
 class TableRequest(BaseModel):
     table: str = Field(..., min_length=1, description="Table name for Redis ingestion")
-    notification_email: Optional[str] = Field(
-        None, description="Optional email for notifications"
+    notification_email: list[str] = Field(
+        [], description="Optional email for notifications"
     )
 
     @field_validator("notification_email")
-    def validate_email(cls, v):
-        if v and "@" not in v:
-            raise ValueError("Invalid email address")
+    def validate_email(cls, v: list[str]) -> list[str]:
+        for email in v:
+            if "@" not in email:
+                v.remove(email)
+                logger.warning(f"Removed invalid email address: {email}")
+                continue
+        if v == []:
+            logger.info("No valid email addresses provided")
+
         return v
 
 class IngestionResponse(BaseModel):

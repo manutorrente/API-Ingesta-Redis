@@ -36,7 +36,7 @@ def validate_table_name(table_name: str) -> None:
         )
 
 
-def run_redis_ingestion_script(table_name: str, notification_email: str | None = None) -> int:
+def run_redis_ingestion_script(table_name: str, notification_email: list[str]) -> int:
     """
     Runs the Redis ingestion script in fire-and-forget mode.
     Starts the script and completely detaches from it, returning immediately.
@@ -87,8 +87,9 @@ def run_redis_ingestion_script(table_name: str, notification_email: str | None =
     command = ["/bin/bash", script_name, "-t", table_name]
     
     if notification_email:
-        command.extend(["--receiver-email", notification_email])
-
+        emails_str = " ".join(notification_email)
+        command.extend(["--receiver-email", emails_str])
+        
     logger.info(f"Running command: {' '.join(command)} in {script_path}")
     
     env = os.environ.copy()
