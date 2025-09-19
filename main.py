@@ -32,7 +32,7 @@ class TableRequest(BaseModel):
     @field_validator("notification_email")
     def validate_email(cls, v: list[str]) -> list[str]:
         for email in v:
-            if "@" not in email:
+            if "@" not in email or "." not in email.split("@")[-1]:
                 v.remove(email)
                 logger.warning(f"Removed invalid email address: {email}")
                 continue
