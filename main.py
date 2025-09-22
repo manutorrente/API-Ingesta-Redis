@@ -33,11 +33,7 @@ class TableRequest(BaseModel):
     def validate_email(cls, v: list[str]) -> list[str]:
         for email in v:
             if "@" not in email or "." not in email.split("@")[-1]:
-                v.remove(email)
-                logger.warning(f"Removed invalid email address: {email}")
-                continue
-        if v == []:
-            logger.info("No valid email addresses provided")
+                raise ValueError(f"Invalid email address: {email}")
 
         return v
 
