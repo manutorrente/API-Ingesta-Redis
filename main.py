@@ -94,20 +94,21 @@ async def trigger_ingestion(
         username: Authenticated username (from basic auth)
     
     Returns:
-        IngestionResponse with success status, message, and process ID
+        IngestionResponse with PID, log file path, and table name
     """
     try:
         logger.info(f"User {username} triggering ingestion for table: {request.table}")
         
-        pid = run_redis_ingestion_script(request.table, request.notification_email)
+        # run_redis_ingestion_script now returns a dict with pid, log_file, table_name
+        result = run_redis_ingestion_script(request.table, request.notification_email)
         
-        logger.info(f"Successfully started ingestion script with PID {pid} for table: {request.table}")
-        
-        return IngestionResponse(
-            success=True,
-            message=f"Ingestion script started successfully for table '{request.table}'",
-            pid=pid
+        logger.info(
+            f"Successfully started ingestion script with PID {result['pid']} "
+            f"for table: {request.table}. Log file: {result['log_file']}"
         )
+        
+        # Return the dict directly - Pydantic will validate it
+        return IngestionResponse(**result)
         
     except ValueError as e:
         logger.error(f"Validation error: {str(e)}")
