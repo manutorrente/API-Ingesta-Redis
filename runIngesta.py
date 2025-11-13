@@ -88,7 +88,7 @@ def run_redis_ingestion_script(table_name: str, notification_email: list[str]) -
     
     if notification_email:
         emails_str = " ".join(notification_email)
-        command.extend(["--receiver-email", emails_str])
+        command.extend(["--receiver-emails", emails_str])
         
     logger.info(f"Running command: {' '.join(command)} in {script_path}")
     
