@@ -38,9 +38,9 @@ class TableRequest(BaseModel):
         return v
 
 class IngestionResponse(BaseModel):
-    success: bool
-    message: str
-    pid: Optional[int] = None
+    pid: int
+    log_file: str
+    table_name: str
 
 def get_current_user(credentials: HTTPBasicCredentials = Depends(security)):
     """Verify basic authentication credentials"""
